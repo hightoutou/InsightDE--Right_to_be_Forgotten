@@ -1,28 +1,27 @@
-# Evolving-Classifier
+# Right to be Forgotten
 
 ## Project Idea
 
-When people apply machine learning models on streaming data, the model performance will degrade with the change of the distribution and inherent features of the data stream.
-I’m going to implement a machine learning pipeline that can automatically switch to a better model when the performance of current model becomes degrading.
+Most data storage and processing systems were originally designed to treat data as invaluable, with fault-tolerance designed to never lose data. However, new regulations like GDPR require data teams to allow users to purge their systems of all data associated with that user. I'm going to build a data processing pipeline with the "right to be forgotten" for both streaming data and historical data. 
 
 
 ## Business Case
 
-Social media sites like Instagram provide users with content that makes it easy to buy drugs and connect with dealers. It’s urgent to have a good algorithm to classify drugs from images and prevent the transactions. However, since drugs keep evolving with time, we need to have an evolving classifier.
+For websites like Airbnb who have very large traffic, it's important to implement lots of streaming analytics to better understand the behaviors of users. When some users require to delete their data, we should have rapid response for both streaming analysis and hostorical analysis.
 
 
 ## Dataset
 
-Simulating several image streams contain different kinds of illegal drugs(from old styles to up-to-date styles), and combining these streams to normal images not containing illegal drugs.
-Size: TBD
+1. Airbnb New User bookings(https://www.kaggle.com/c/airbnb-recruiting-new-user-bookings/data)
+2. Simulated data for user's deletion requests
 
 
 ## Engineering Challenge
 
-1. Build a system to switch the ML model automatically according to the real-time model performance.
-2. Ingest multiple image streams in real time.
+1. To integrate the deletion requests to streaming process.
+2. Efficiently delete the historical data and modify the historical analyzed results for users who have deletion requests.
 
 
 ## Tech Stack
-Kafka, Kubernetes, Docker
+S3, Kafka, Spark, ProsgreSQL
 
