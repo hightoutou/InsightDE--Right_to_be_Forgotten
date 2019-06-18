@@ -19,7 +19,7 @@ df = df.sample(frac=1).reset_index(drop=True)
 
 from io import StringIO # python3
 csv_buffer = StringIO()
-df.to_csv(csv_buffer, sep = ' ', header=None, index=False)
+df.to_csv(csv_buffer, sep = '\t', header=None, index=False)
 s3_resource = boto3.resource('s3')
 s3_resource.Object('airbnbbookingwqk', 'sessions_shuffle.csv').put(Body=csv_buffer.getvalue())
 
