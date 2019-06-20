@@ -32,7 +32,17 @@ fromoffset = {topicpartion: int(start)}
 # Connect to Kafka
 requestStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list":config['broker_list']}, fromOffsets = fromoffset)
 lines = requestStream.map(lambda x: x[1])
+
+# Write users to Redis
+def db_update(users):
+    rdb = redis.StrictRedis(redis_server, port=6379, db=0, decode_responses=True)
+    for user in users:
+        rdb.append(user, 1)
+    return users 
+
 lines.count().pprint()
+lines_update = lines.mapPartitions(db_update)
+lines_update.pprint()
 
 ########### Processing Sessions Stream ###############
 
@@ -55,14 +65,15 @@ def deletion_filter(lines):
     cursor = '0'
     while cursor != 0:
         cursor, keys = rdb.scan(cursor=cursor)
-        values = rdb.mget(*keys)
-        users_deletion.update([value for value in values if value is not None])
-    print(users_deletion)     
+        #values = rdb.mget(*keys)
+        users_deletion.update([user for user in keys if user is not None])
+    print("Number of Deletion Requests: "+str(len(users_deletion)))     
 # Count the number of sessions for each device in each batch
     #users_deletion = set(['egmo531wtv', 'ks6hq5c4m4', 'pwituw3s7v', '87fdgatj2f', 'ldgl5jmdo2'])
     return [line for line in lines if line[0] not in users_deletion]
 
 device_counts_filter = lines_list.mapPartitions(deletion_filter).map(lambda l: l[4]).countByValue() 
+device_counts = lines_list.map(lambda l: l[4]).countByValue()
 
 # Count the cumulative number of sessions for each device
 def update_count(new_count, count_sum):
@@ -70,8 +81,14 @@ def update_count(new_count, count_sum):
         count_sum = 0
     return sum(new_count) + count_sum
 
-device_counts_filter_sum = device_counts_filter.updateStateByKey(update_count)
-device_counts_filter_sum.pprint()
+#device_counts_filter_sum = device_counts_filter.updateStateByKey(update_count)
+#device_counts_filter_sum.pprint()
+
+
+#device_counts_sum = device_counts.updateStateByKey(update_count)
+#device_counts_sum.pprint()
+device_counts_filter.pprint()
+device_counts.pprint()
 
 ssc.start()
 ssc.awaitTermination()
