@@ -7,10 +7,13 @@ import boto3
 from smart_open import smart_open
 
 users = []
+n = 0
 for msg in smart_open('s3://airbnbbookingwqk/sessions_shuffle.csv', 'rb'):
     user_id = str(msg, "utf-8").split('\t')[0]
     users.append(user_id)
-
+    n += 1
+    if n % 100000 == 0:
+        print(n)
 
 # Write new df to s3
 
