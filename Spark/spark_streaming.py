@@ -8,6 +8,7 @@ from pyspark.streaming import StreamingContext, StreamingListener
 from pyspark.streaming.kafka import KafkaUtils, TopicAndPartition
 import yaml
 import redis
+import psycopg2, datetime
 
 with open("config.yml", 'r') as ymlfile:
     config = yaml.load(ymlfile)
@@ -68,12 +69,13 @@ def deletion_filter(lines):
         #values = rdb.mget(*keys)
         users_deletion.update([user for user in keys if user is not None])
     print("Number of Deletion Requests: "+str(len(users_deletion)))     
-# Count the number of sessions for each device in each batch
-    #users_deletion = set(['egmo531wtv', 'ks6hq5c4m4', 'pwituw3s7v', '87fdgatj2f', 'ldgl5jmdo2'])
     return [line for line in lines if line[0] not in users_deletion]
 
-device_counts_filter = lines_list.mapPartitions(deletion_filter).map(lambda l: l[4]).countByValue() 
-device_counts = lines_list.map(lambda l: l[4]).countByValue()
+#device_counts_filter = lines_list.mapPartitions(deletion_filter).map(lambda l: l[4]).countByValue() 
+#device_counts = lines_list.map(lambda l: l[4]).countByValue()
+
+device_counts_filter = lines_list.mapPartitions(deletion_filter).map(lambda l: l[4]).map(lambda x: (x, 1)).reduceByKey(lambda x, y:x + y)
+device_counts = lines_list.map(lambda l: l[4]).map(lambda x: (x, 1)).reduceByKey(lambda x, y:x + y)
 
 # Count the cumulative number of sessions for each device
 def update_count(new_count, count_sum):
@@ -83,12 +85,40 @@ def update_count(new_count, count_sum):
 
 #device_counts_filter_sum = device_counts_filter.updateStateByKey(update_count)
 #device_counts_filter_sum.pprint()
-
-
 #device_counts_sum = device_counts.updateStateByKey(update_count)
 #device_counts_sum.pprint()
+
+
+def sendToSQL(rdd):
+    connection = psycopg2.connect(host = 'ip-10-0-0-5', port = '5431', database = 'my_db', user = 'spark', password = 'spark')
+    cursor = connection.cursor()
+    timestamp = datetime.datetime.now()
+    for line in rdd:
+        query = 'INSERT INTO device_counts VALUES (%s, %s, %s)'
+        data = (timestamp, line[0], line[1])
+        cursor.execute(query, data)
+    connection.commit()
+    connection.close()
+
+def sendToSQL_filter(rdd):
+    connection = psycopg2.connect(host = 'ip-10-0-0-5', port = '5431', database = 'my_db', user = 'spark', password = 'spark')
+    cursor = connection.cursor()
+    timestamp = datetime.datetime.now()
+    for line in rdd:
+        query = 'INSERT INTO device_counts_filter VALUES (%s, %s, %s)'
+        data = (timestamp, line[0], line[1])
+        cursor.execute(query, data)
+    connection.commit()
+    connection.close()
+
+
+device_counts_filter.foreachRDD(lambda rdd: rdd.foreachPartition(sendToSQL_filter))
+device_counts.foreachRDD(lambda rdd: rdd.foreachPartition(sendToSQL))
+
 device_counts_filter.pprint()
 device_counts.pprint()
+
+
 
 ssc.start()
 ssc.awaitTermination()
