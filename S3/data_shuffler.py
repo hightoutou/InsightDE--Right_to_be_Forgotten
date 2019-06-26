@@ -1,7 +1,10 @@
-# Python 3 codes to shuffle the session stream
+#!/usr/bin/python3.6
+
+###############################
+# shuffle the session stream
+###############################
 
 # Read data from S3
-
 import boto3
 import io
 import pandas as pd
@@ -11,12 +14,10 @@ df = pd.read_csv(io.BytesIO(obj['Body'].read()))
 
 
 # Shuffle all rows
-
 df = df.sample(frac=1).reset_index(drop=True)
 
 
 # Write new df to s3
-
 from io import StringIO # python3
 csv_buffer = StringIO()
 df.to_csv(csv_buffer, sep = '\t', header=None, index=False)

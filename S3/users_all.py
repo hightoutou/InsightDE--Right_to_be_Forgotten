@@ -1,7 +1,10 @@
-# Python 3 codes to shuffle the session stream
+#!/usr/bin/python3.6
+
+###############################
+# Save all unique user ids preparing for generate request stream
+###############################
 
 # Read data from S3
-
 import pandas as pd
 import boto3
 from smart_open import smart_open

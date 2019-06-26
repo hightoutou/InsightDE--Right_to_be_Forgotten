@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+
+##########################
+# Test reading data from Redis
+##########################
+
+
 import redis
 
 redis_server = 'ec2-52-34-94-103.us-west-2.compute.amazonaws.com'

@@ -8,7 +8,9 @@
 /usr/local/kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 2 --topic sessions
 /usr/local/kafka/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 2 --topic requests
 
-
+# Change number of partitions for a topic
+ /usr/local/kafka/bin/kafka-topics.sh --alter --zookeeper localhost:2181 --topic sessions --partitions 10
+ 
 # Console producer to write messeages to a topic
 
 /usr/local/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic requests

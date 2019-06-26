@@ -1,5 +1,6 @@
+#!/usr/bin/python3.6
+
 #########################
-# pyhton3 file kafka_producer.py
 # read data from s3 and send it to kafka-cluster
 #########################
 
@@ -44,9 +45,9 @@ def main():
         
         offset += 1
         n += 1
-        if n == 1000:
-            break
-        time.sleep(0.1)
+        #if n == 1000:
+        #    break
+        #time.sleep(0.1)
     return
 
 if __name__ == '__main__':
