@@ -11,16 +11,19 @@ from smart_open import smart_open
 import yaml
 from random import randint
 import sys
-
-
+import time
+        
 # read config file
 with open("config.yml", 'r') as ymlfile:
     config = yaml.load(ymlfile)
 
-fpath = config['s3_fpath_session'] + '_' + str(sys.argv[1]) + '.csv'
-producer = KafkaProducer(bootstrap_servers = config['bootstrap_servers_address'])
+fpath = config['s3_fpath_user'] + '_' + str(sys.argv[1]) + '.csv'
+producer = KafkaProducer(bootstrap_servers = config['bootstrap_servers_address'])   
 
-for msg in smart_open(fpath, 'rb'):
+dt = 4/float(sys.argv[2]) - 1/600
+for user in smart_open(fpath, 'rb'):
     # send the sessions
-    producer.send('sessions', msg)
-    producer.flush()
+    producer.send('requests', user[:-1])
+    producer.flush()        
+    time.sleep(dt)
+

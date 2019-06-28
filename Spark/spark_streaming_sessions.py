@@ -21,7 +21,9 @@ ssc = StreamingContext(sc, 1)
 
 # Connect to Kafka and split each message to list of strings
 topic = "sessions"
-sessionStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list":config['broker_list'], 'auto.offset.reset':'smallest'})
+# sessionStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list":config['broker_list'], 'auto.offset.reset':'smallest'})
+sessionStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list":config['broker_list']})
+
 lines = sessionStream.map(lambda x: x[1])
 lines_list = lines.map(lambda line: line[:-1].split("\t"))
 
@@ -57,7 +59,7 @@ def sendToSQL_filter(rdd):
     """
     Write results to PostgreSQL
     """
-    connection = psycopg2.connect(host = 'ip-10-0-0-5', port = '5431', database = 'my_db', user = 'spark', password = 'spark')
+    connection = psycopg2.connect(host = 'ip-10-0-0-5', port = '5431', database = 'my_db', user = config['postgres_user'], password = config['postgres_password'])
     cursor = connection.cursor()
     timestamp = datetime.datetime.now()
     for line in rdd:
