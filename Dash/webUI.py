@@ -85,6 +85,7 @@ app.layout = html.Div(children=[
         )
     ]),
 
+    # Choose Deletion Request Rate
     html.Div([
 
         html.Div(
@@ -116,7 +117,7 @@ app.layout = html.Div(children=[
         ])
     ]),
 
-    # Start button and Stop button
+    # Start button, Stop button, and Clear button
     html.Div(children = [
     	html.Button(
     		id = 'startButton',
@@ -153,7 +154,7 @@ app.layout = html.Div(children=[
     ]),
 
 
-    # Plot the number of each device over time
+    # Plot the average elapsed time for given action type and device type 
     html.Div([
         html.Div([
             dcc.Graph(id='counts_plot')

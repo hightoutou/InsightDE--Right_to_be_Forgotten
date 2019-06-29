@@ -1,2 +1,9 @@
 config.yml
 download.sh
+kafka_producer_old.py
+session_producers.sh
+stop_all.sh
+spark_streaming_old.py
+redis_reader.py
+redis_writer.py
+postgres_writer.py

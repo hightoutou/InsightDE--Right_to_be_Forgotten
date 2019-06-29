@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##############
-#### run Kafka producers
+#### run Kafka producers for the session stream
 ##############
 
 

@@ -21,8 +21,9 @@ ssc = StreamingContext(sc, 2)
 
 # Connect to Kafka and split each message to list of strings
 topic = "sessions"
-# sessionStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list":config['broker_list'], 'auto.offset.reset':'smallest'})
+
 sessionStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list":config['broker_list']})
+# add {'auto.offset.reset':'smallest'} to read from beginning
 
 lines = sessionStream.map(lambda x: x[1])
 lines_list = lines.map(lambda line: line[:-1].split("\t"))
@@ -38,7 +39,6 @@ def deletion_filter_local(lines):
     cursor = '0'
     while cursor != 0:
         cursor, keys = rdb.scan(cursor=cursor)
-        #values = rdb.mget(*keys)
         users_deletion.update([user for user in keys if user is not None])
     print("Number of Deletion Requests: "+str(len(users_deletion)))     
     return [line for line in lines if line[0] not in users_deletion]
@@ -59,8 +59,6 @@ device_avg_time_filter = lines_list_filter.filter(lambda l: l[5].replace('.','',
                                           .reduceByKey(lambda a,b: (a[0]+b[0], a[1]+b[1])) \
                                           .mapValues(lambda v: v[0]/v[1])
 lines_list.count().pprint()
-#lines_list_filter.count().pprint()
-
 
 ########### Send Metrics to PostgreSQL  ###############
 

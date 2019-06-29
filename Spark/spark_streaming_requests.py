@@ -21,7 +21,6 @@ ssc = StreamingContext(sc, 1)
 
 # Connect to Kafka
 topic = "requests"
-#requestStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list":config['broker_list'], 'auto.offset.reset':'smallest'})
 requestStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list":config['broker_list']})
 lines = requestStream.map(lambda x: x[1])
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##############
-#### run Kafka producers
+#### run Kafka producers for the request stream
 ##############
 
 python3 kafka_producer_requests.py 1 $1 &
