@@ -1,11 +1,11 @@
 # Right to be Forgotten
----
 
 ### Achieving GDPR compliance for streaming pipelines.
 [slides link](https://docs.google.com/presentation/d/1NZEV2L6OCQwfJSpCsUan6cOmVcPRg0_UnywuBtEYJKI/edit#slide=id.g5c18997a73_1_1163)
 
-## Tools Setup
 ---
+
+## Tools Setup
 
 ### 0. Install Pegasus on local machine
 reference: https://github.com/InsightDataScience/pegasus/blob/master/README.md#install-pegasus-on-your-local-machine
@@ -112,9 +112,9 @@ peg service spark-cluster spark start
 #### c. WordCount Example
 Reference:https://github.com/InsightDataScience/data-engineering-ecosystem/wiki/spark-intro#word-count-problem-with-the-spark-shell-repl-on-the-master-node
 
+---
 
 ## Introduction
----
 
 Most data storage and processing systems were originally designed to treat data as invaluable, with fault-tolerance designed to never lose data. However, new regulations like GDPR require data teams to allow users to purge their systems of all data associated with that user. 
 
@@ -122,15 +122,15 @@ For websites like Airbnb who have very large traffic, it's important to implemen
 
 I'm going to build a streaming pipeline with the "right to be forgotten" feature to achieve GDPR compliance.
 
+---
 
 ## Architecture
----
 
 ![alt text](https://github.com/hightoutou/InsightDE--Right_to_be_Forgotten/blob/master/images/Pipeline.png)
 
+---
 
 ## Dataset
----
 
 ### 1. Session Stream
 * 10M rows from [Airbnb New User Bookings Dataset](https://www.kaggle.com/c/airbnb-recruiting-new-user-bookings/data)
@@ -140,9 +140,9 @@ I'm going to build a streaming pipeline with the "right to be forgotten" feature
 * 100K unique user ids
 * Simulate the stream of users’ deletion requests
 
+---
 
 ## Engineering Challenge
----
 
 ### 1. Throughput 
 
