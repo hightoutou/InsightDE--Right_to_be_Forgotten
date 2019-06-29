@@ -1,3 +1,4 @@
+.DS_Store
 config.yml
 download.sh
 kafka_producer_old.py
