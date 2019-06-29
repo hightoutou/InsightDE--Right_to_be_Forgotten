@@ -17,7 +17,7 @@ with open("config.yml", 'r') as ymlfile:
 # Create Spark Streaming Context
 sc = SparkContext(appName="consuming_sessions")
 sc.setLogLevel("Error")
-ssc = StreamingContext(sc, 1)
+ssc = StreamingContext(sc, 2)
 
 # Connect to Kafka and split each message to list of strings
 topic = "sessions"
@@ -29,9 +29,9 @@ lines_list = lines.map(lambda line: line[:-1].split("\t"))
 
 ########### Filtering sessions stream and calculate the metrics ###############
  
-def deletion_filter(lines):
+def deletion_filter_local(lines):
     """
-    Delete the messages from users with deletion requests
+    Fetch data from redis and Delete the messages from users with deletion requests
     """
     rdb = redis.StrictRedis(config['redis_server'], port=6379, db=0, decode_responses=True)    
     users_deletion = set()
@@ -43,14 +43,23 @@ def deletion_filter(lines):
     print("Number of Deletion Requests: "+str(len(users_deletion)))     
     return [line for line in lines if line[0] not in users_deletion]
 
+def deletion_filter_remote(lines):
+    """
+    Check the existence of user ids on Redis server and delete the messages from users with deletion requests
+    """
+    rdb = redis.StrictRedis(config['redis_server'], port=6379, db=0, decode_responses=True)
+    return [line for line in lines if rdb.get(line[0]) is None]
+
+
 # Calculate theaverage elapsed time for each (action_type, device_type)
-device_avg_time_filter = lines_list.mapPartitions(deletion_filter) \
-                            .filter(lambda l: l[5].replace('.','',1).isdigit()) \
-                            .map(lambda l: ((l[2], l[4]), float(l[5]))) \
-                            .mapValues(lambda v: (v, 1)) \
-                            .reduceByKey(lambda a,b: (a[0]+b[0], a[1]+b[1])) \
-                            .mapValues(lambda v: v[0]/v[1])
+lines_list_filter = lines_list.mapPartitions(deletion_filter_remote)
+device_avg_time_filter = lines_list_filter.filter(lambda l: l[5].replace('.','',1).isdigit()) \
+                                          .map(lambda l: ((l[2], l[4]), float(l[5]))) \
+                                          .mapValues(lambda v: (v, 1)) \
+                                          .reduceByKey(lambda a,b: (a[0]+b[0], a[1]+b[1])) \
+                                          .mapValues(lambda v: v[0]/v[1])
 lines_list.count().pprint()
+#lines_list_filter.count().pprint()
 
 
 ########### Send Metrics to PostgreSQL  ###############
