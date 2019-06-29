@@ -126,7 +126,7 @@ I'm going to build a streaming pipeline with the "right to be forgotten" feature
 ## Architecture
 ---
 
-![alt text][https://github.com/hightoutou/InsightDE--Right_to_be_Forgotten/blob/master/images/Pipeline.png]
+![alt text](https://github.com/hightoutou/InsightDE--Right_to_be_Forgotten/blob/master/images/Pipeline.png)
 
 
 ## Dataset
@@ -146,14 +146,14 @@ I'm going to build a streaming pipeline with the "right to be forgotten" feature
 
 ### 1. Throughput 
 
-![alt text][https://github.com/hightoutou/InsightDE--Right_to_be_Forgotten/blob/master/images/Throughput.png]
+![alt text](https://github.com/hightoutou/InsightDE--Right_to_be_Forgotten/blob/master/images/Throughput.png)
 
 I increased the throughput from 700 messages per second to 10K messages per second.
 
 
 ### 2. Latency
 
-![alt text][https://github.com/hightoutou/InsightDE--Right_to_be_Forgotten/blob/master/images/Latency_filtering.png]
+![alt text](https://github.com/hightoutou/InsightDE--Right_to_be_Forgotten/blob/master/images/Latency_filtering.png)
 
 The main part of latency comes from filtering stream according to the deletion table stored on Redis. I tested the performance for two different filtering methods. The choice between two methods depends on the size of deletion table and the minibatch size.
 
